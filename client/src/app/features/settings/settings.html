@@ -1,1 +1,309 @@
-<div>Settings — coming soon</div>
+<div class="settings-page">
+
+  <div class="settings-header">
+    <h1 class="settings-header__title">Settings</h1>
+    <p class="settings-header__subtitle">
+      Configure Jarvis runtime behaviour
+    </p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span>
+      Loading settings...
+    </div>
+  }
+
+  @if (!isLoading()) {
+    <div class="settings-grid">
+
+      <!-- ── Voice settings ───────────────────── -->
+      <section class="card">
+
+        <div class="card__header">
+          <span class="material-symbols-rounded
+                       card__icon">
+            mic
+          </span>
+          <div>
+            <h2 class="card__title">
+              Voice Settings
+            </h2>
+            <p class="card__subtitle">
+              Configure text-to-speech behaviour
+            </p>
+          </div>
+        </div>
+
+        <!-- Current engine info -->
+        @if (settings()) {
+          <div class="info-row">
+            <span class="info-row__label">
+              TTS Engine
+            </span>
+            <span class="info-row__value">
+              {{ settings()!.voice.ttsEngine }}
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="info-row__label">
+              Whisper Mode
+            </span>
+            <span class="info-row__value">
+              {{ settings()!.voice.whisperMode }}
+            </span>
+          </div>
+        }
+
+        <div class="divider"></div>
+
+        <!-- Voice form -->
+        <form
+          [formGroup]="voiceForm"
+          (ngSubmit)="saveVoiceSettings()">
+
+          <div class="field">
+            <label
+              class="field__label"
+              for="voice-name">
+              Voice Name
+              <span class="field__hint">
+                (empty = system default)
+              </span>
+            </label>
+            <input
+              id="voice-name"
+              class="field__input"
+              type="text"
+              formControlName="voiceName"
+              placeholder="e.g. Microsoft Zira Desktop"/>
+            <p class="field__description">
+              Windows: Microsoft Zira Desktop ·
+              macOS: Samantha ·
+              Linux: en+f3
+            </p>
+          </div>
+
+          <div class="field">
+            <label
+              class="field__label"
+              for="voice-speed">
+              Speed —
+              {{ formatSpeed(
+              voiceForm.get('voiceSpeed')?.value
+              ?? 1.0) }}
+            </label>
+            <input
+              id="voice-speed"
+              class="field__range"
+              type="range"
+              formControlName="voiceSpeed"
+              min="0.5"
+              max="2.0"
+              step="0.1"/>
+            <div class="range-labels">
+              <span>0.5x (slow)</span>
+              <span>1.0x (normal)</span>
+              <span>2.0x (fast)</span>
+            </div>
+          </div>
+
+          <!-- Error -->
+          @if (errorMessage()) {
+            <div class="alert alert--error">
+              {{ errorMessage() }}
+            </div>
+          }
+
+          <!-- Success -->
+          @if (saveSuccess()) {
+            <div class="alert alert--success">
+              Voice settings saved successfully.
+            </div>
+          }
+
+          <button
+            class="btn btn--primary"
+            type="submit"
+            [disabled]="
+              voiceForm.invalid || isSaving()">
+            @if (isSaving()) {
+              <span class="spinner spinner--sm">
+              </span>
+              Saving...
+            } @else {
+              Save Voice Settings
+            }
+          </button>
+
+        </form>
+
+      </section>
+
+      <!-- ── Provider status ──────────────────── -->
+      <section class="card">
+
+        <div class="card__header">
+          <span class="material-symbols-rounded
+                       card__icon">
+            monitor_heart
+          </span>
+          <div>
+            <h2 class="card__title">
+              Provider Status
+            </h2>
+            <p class="card__subtitle">
+              Live health of connected services
+            </p>
+          </div>
+          <button
+            class="btn btn--ghost btn--sm"
+            (click)="loadHealth()"
+            title="Refresh">
+            <span class="material-symbols-rounded">
+              refresh
+            </span>
+          </button>
+        </div>
+
+        @if (isHealthLoading()) {
+          <div class="loading-inline">
+            <span class="spinner"></span>
+            Checking services...
+          </div>
+        }
+
+        @if (!isHealthLoading()) {
+          <div class="health-list">
+            @for (
+              entry of healthEntries;
+              track entry.key
+              ) {
+              <div class="health-item">
+                <span
+                  class="material-symbols-rounded
+                         health-item__icon">
+                  {{ getComponentIcon(entry.key) }}
+                </span>
+                <span class="health-item__label">
+                  {{ getComponentLabel(entry.key) }}
+                </span>
+                <span
+                  class="health-badge"
+                  [class.health-badge--up]="
+                    isUp(entry.status)"
+                  [class.health-badge--down]="
+                    !isUp(entry.status)">
+                  {{ entry.status }}
+                </span>
+              </div>
+            }
+
+            @if (healthEntries.length === 0) {
+              <p class="empty-health">
+                No service status available.
+              </p>
+            }
+          </div>
+
+          @if (settings()) {
+            <div class="divider"></div>
+            <div class="info-row">
+              <span class="info-row__label">
+                Primary Provider
+              </span>
+              <span class="info-row__value">
+                {{ settings()!.provider.primaryProvider }}
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="info-row__label">
+                Active Model
+              </span>
+              <span class="info-row__value">
+                {{ settings()!.provider.primaryModel }}
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="info-row__label">
+                Gemini Fallback
+              </span>
+              <span class="info-row__value">
+                @if (settings()!.provider.geminiConfigured) {
+                  <span class="badge badge--success">
+                    Configured
+                  </span>
+                } @else {
+                  <span class="badge badge--muted">
+                    Not configured
+                  </span>
+                }
+              </span>
+            </div>
+          }
+        }
+
+      </section>
+
+      <!-- ── System info ───────────────────────── -->
+      @if (settings()) {
+        <section class="card card--wide">
+
+          <div class="card__header">
+            <span class="material-symbols-rounded
+                         card__icon">
+              info
+            </span>
+            <div>
+              <h2 class="card__title">
+                System Information
+              </h2>
+              <p class="card__subtitle">
+                Current runtime environment
+              </p>
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-row">
+              <span class="info-row__label">
+                Jarvis Version
+              </span>
+              <span class="info-row__value">
+                v{{ settings()!.system.version }}
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="info-row__label">
+                Java Version
+              </span>
+              <span class="info-row__value">
+                {{ settings()!.system.javaVersion }}
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="info-row__label">
+                License
+              </span>
+              <span class="info-row__value">
+                Apache 2.0
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="info-row__label">
+                Philosophy
+              </span>
+              <span class="info-row__value
+                           info-row__value--accent">
+                Your AI. Your Data. Your Machine.
+              </span>
+            </div>
+          </div>
+
+        </section>
+      }
+
+    </div>
+  }
+
+</div>

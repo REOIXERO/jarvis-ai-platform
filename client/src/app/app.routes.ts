@@ -53,7 +53,7 @@ export const routes: Routes = [
         path: 'settings',
         loadComponent: () =>
           import('./features/settings/settings')
-            .then(m => m.Settings)
+            .then(m => m.settings)
       },
       {
         path: '',
