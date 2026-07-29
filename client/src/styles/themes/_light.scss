@@ -1,6 +1,5 @@
 @use '../variables' as *;
 
-// Applied when .light-theme class on body
 .light-theme {
   --bg-primary:      #{$bg-primary-light};
   --bg-secondary:    #{$bg-secondary-light};
@@ -14,4 +13,9 @@
   --accent-primary:  #{$accent-primary};
   --accent-hover:    #{$accent-hover};
   --accent-subtle:   #e0e7ff;
+
+  --success:         #{$success};
+  --warning:         #{$warning};
+  --error:           #{$error};
+  --info:            #{$info};
 }
