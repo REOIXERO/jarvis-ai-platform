@@ -29,7 +29,7 @@ export const routes: Routes = [
         path: 'memory',
         loadComponent: () =>
           import('./features/memory/memory')
-            .then(m => m.Memory)
+            .then(m => m.MemoryPage)
       },
       {
         path: 'documents',

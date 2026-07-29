@@ -1,0 +1,476 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ── Page ──────────────────────────────────────────
+
+.memory-page {
+  @include flex-col;
+
+  gap: $space-lg;
+  padding: $space-xl;
+  height: 100%;
+  overflow-y: auto;
+  @include custom-scrollbar;
+}
+
+// ── Header ────────────────────────────────────────
+
+.memory-header {
+  @include flex-between;
+
+  flex-wrap: wrap;
+  gap: $space-md;
+
+  &__left {
+    @include flex-col;
+
+    gap: 4px;
+  }
+
+  &__title {
+    font-size: $font-xl;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+  }
+
+  &__subtitle {
+    font-size: $font-sm;
+    color: var(--text-muted);
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+  }
+}
+
+// ── Alerts ────────────────────────────────────────
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-sm $space-md;
+  border-radius: $radius-sm;
+  font-size: $font-sm;
+  font-weight: 500;
+
+  span.material-symbols-rounded {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  &--error {
+    // Uses CSS custom properties so light/dark theme works
+    background: var(--error-surface);
+    color: var(--error);
+    border: 1px solid var(--error-border);
+  }
+
+  &--success {
+    background: var(--success-surface);
+    color: var(--success);
+    border: 1px solid var(--success-border);
+  }
+}
+
+// ── Add form card ─────────────────────────────────
+
+.add-form-card {
+  @include card;
+  @include flex-col;
+
+  gap: $space-md;
+
+  &__title {
+    font-size: $font-md;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: $space-md;
+  align-items: flex-end;
+
+  @include mobile {
+    @include flex-col;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $space-xs;
+}
+
+// ── Form fields ───────────────────────────────────
+
+.field {
+  @include flex-col;
+
+  gap: $space-xs;
+
+  &--narrow {
+    width: 160px;
+    flex-shrink: 0;
+
+    @include mobile {
+      width: 100%;
+    }
+  }
+
+  &--grow {
+    flex: 1;
+  }
+
+  &__label {
+    font-size: $font-sm;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  &__input,
+  &__select {
+    padding: 10px $space-md;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--bg-elevated);
+    border-radius: $radius-sm;
+    color: var(--text-primary);
+    font-size: $font-sm;
+    font-family: $font-family;
+    outline: none;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      border-color: var(--accent-primary);
+    }
+
+    &::placeholder {
+      color: var(--text-muted);
+    }
+  }
+
+  &__select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%239ca3b8' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+}
+
+// ── Confirm dialog ────────────────────────────────
+
+.confirm-dialog {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg);
+  @include flex-center;
+
+  z-index: 100;
+  padding: $space-lg;
+
+  &__box {
+    background: var(--bg-secondary);
+    border: 1px solid var(--bg-elevated);
+    border-radius: $radius-lg;
+    padding: $space-xl;
+    max-width: 400px;
+    width: 100%;
+    @include flex-col;
+
+    align-items: center;
+    gap: $space-md;
+    text-align: center;
+
+    // Show focus outline when dialog is focused
+    // programmatically via confirmBox.focus()
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__icon {
+    font-size: 40px;
+    color: var(--warning);
+  }
+
+  &__title {
+    font-size: $font-lg;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  &__text {
+    font-size: $font-sm;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-md;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// ── Loading + empty states ────────────────────────
+
+.loading-state {
+  @include flex-center;
+
+  gap: $space-sm;
+  color: var(--text-muted);
+  font-size: $font-sm;
+  padding: $space-2xl;
+}
+
+.empty-state {
+  @include flex-col;
+  @include flex-center;
+
+  gap: $space-md;
+  padding: $space-2xl;
+  text-align: center;
+  flex: 1;
+
+  &__icon {
+    font-size: 56px;
+    color: var(--bg-elevated);
+  }
+
+  &__title {
+    font-size: $font-lg;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  &__text {
+    font-size: $font-sm;
+    color: var(--text-muted);
+    max-width: 360px;
+    line-height: 1.6;
+  }
+}
+
+// ── Memory list ───────────────────────────────────
+
+.memory-list {
+  @include flex-col;
+
+  gap: $space-sm;
+}
+
+// ── Memory card ───────────────────────────────────
+
+.memory-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: $space-md;
+  padding: $space-md;
+  background: var(--bg-secondary);
+  border: 1px solid var(--bg-elevated);
+  border-radius: $radius-md;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--bg-elevated);
+
+    .memory-card__delete {
+      opacity: 1;
+    }
+  }
+
+  // Show delete button when any child is focused
+  // Makes delete reachable by keyboard users
+  &:focus-within .memory-card__delete {
+    opacity: 1;
+  }
+
+  @include mobile {
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
+  }
+
+  &__type {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: $radius-full;
+    font-size: $font-xs;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    span {
+      font-size: 14px;
+    }
+  }
+
+  &__content {
+    font-size: $font-sm;
+    color: var(--text-primary);
+    line-height: 1.5;
+    overflow-wrap: break-word;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    flex-shrink: 0;
+
+    @include mobile {
+      grid-column: 1 / -1;
+    }
+  }
+
+  &__meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: $font-xs;
+    color: var(--text-muted);
+
+    span {
+      font-size: 14px;
+    }
+  }
+
+  &__delete {
+    opacity: 0;
+    color: var(--text-muted);
+    padding: 4px;
+    border-radius: $radius-sm;
+    @include flex-center;
+
+    flex-shrink: 0;
+    transition:
+      opacity 0.15s ease,
+      color 0.15s ease;
+
+    // Show and outline when focused via keyboard
+    &:focus-visible {
+      opacity: 1;
+      outline: 2px solid var(--accent-primary);
+      outline-offset: 2px;
+    }
+
+    span {
+      font-size: 18px;
+    }
+
+    &:hover:not(:disabled) {
+      color: var(--error);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+}
+
+// ── Buttons ───────────────────────────────────────
+
+.btn {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+  border-radius: $radius-sm;
+  font-size: $font-sm;
+  font-weight: 500;
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &--primary {
+    padding: 8px $space-md;
+    background: var(--accent-primary);
+    color: #ffffff;
+
+    span.material-symbols-rounded {
+      font-size: 18px;
+    }
+
+    &:hover:not(:disabled) {
+      background: var(--accent-hover);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &--ghost {
+    padding: 8px $space-md;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--bg-elevated);
+
+    span.material-symbols-rounded {
+      font-size: 18px;
+    }
+
+    &:hover:not(:disabled) {
+      color: var(--text-primary);
+      background: var(--bg-elevated);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &--danger {
+    padding: 8px $space-md;
+    background: var(--error-surface);
+    color: var(--error);
+    border: 1px solid var(--error-border);
+
+    span.material-symbols-rounded {
+      font-size: 18px;
+    }
+
+    &:hover:not(:disabled) {
+      opacity: 0.8;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// ── Spinner ───────────────────────────────────────
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--spinner-track);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+
+  &--dark {
+    border-color: var(--spinner-track-dark);
+    border-top-color: var(--text-muted);
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
