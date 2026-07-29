@@ -5,6 +5,7 @@
 
 .settings-page {
   @include flex-col;
+
   gap: $space-xl;
   padding: $space-xl;
   height: 100%;
@@ -16,6 +17,7 @@
 
 .settings-header {
   @include flex-col;
+
   gap: $space-xs;
 
   &__title {
@@ -35,6 +37,7 @@
 
 .loading-state {
   @include flex-center;
+
   gap: $space-sm;
   color: var(--text-muted);
   font-size: $font-sm;
@@ -67,6 +70,7 @@
 .card {
   @include card;
   @include flex-col;
+
   gap: $space-md;
 
   &--wide {
@@ -81,7 +85,7 @@
 
   &__icon {
     font-size: 24px;
-    color: $accent-primary;
+    color: var(--accent-primary);
     flex-shrink: 0;
     margin-top: 2px;
   }
@@ -103,6 +107,7 @@
 
 .info-row {
   @include flex-between;
+
   padding: $space-xs 0;
   font-size: $font-sm;
 
@@ -116,7 +121,7 @@
     text-align: right;
 
     &--accent {
-      color: $accent-primary;
+      color: var(--accent-primary);
       font-style: italic;
     }
   }
@@ -124,6 +129,7 @@
 
 .info-grid {
   @include flex-col;
+
   gap: $space-xs;
 }
 
@@ -139,6 +145,7 @@
 
 .field {
   @include flex-col;
+
   gap: $space-xs;
 
   &__label {
@@ -169,13 +176,13 @@
     }
 
     &:focus {
-      border-color: $accent-primary;
+      border-color: var(--accent-primary);
     }
   }
 
   &__range {
     width: 100%;
-    accent-color: $accent-primary;
+    accent-color: var(--accent-primary);
     cursor: pointer;
     height: 4px;
   }
@@ -189,6 +196,7 @@
 
 .range-labels {
   @include flex-between;
+
   font-size: $font-xs;
   color: var(--text-muted);
 }
@@ -197,6 +205,7 @@
 
 .health-list {
   @include flex-col;
+
   gap: $space-sm;
 }
 
@@ -241,12 +250,12 @@
 
   &--up {
     background: rgba(16, 185, 129, 0.12);
-    color: $success;
+    color: var(--success);
   }
 
   &--down {
     background: rgba(239, 68, 68, 0.12);
-    color: $error;
+    color: var(--error);
   }
 }
 
@@ -258,7 +267,7 @@
 
   &--success {
     background: rgba(16, 185, 129, 0.12);
-    color: $success;
+    color: var(--success);
   }
 
   &--muted {
@@ -277,13 +286,13 @@
 
   &--error {
     background: rgba(239, 68, 68, 0.12);
-    color: $error;
+    color: var(--error);
     border: 1px solid rgba(239, 68, 68, 0.2);
   }
 
   &--success {
     background: rgba(16, 185, 129, 0.12);
-    color: $success;
+    color: var(--success);
     border: 1px solid rgba(16, 185, 129, 0.2);
   }
 }
@@ -304,12 +313,12 @@
 
   &--primary {
     padding: 10px $space-md;
-    background: $accent-primary;
+    background: var(--accent-primary);
     color: #ffffff;
     justify-content: center;
 
     &:hover:not(:disabled) {
-      background: $accent-hover;
+      background: var(--accent-hover);
     }
 
     &:disabled {
