@@ -1,1 +1,271 @@
-<div>Memory — coming soon</div>
+<div class="memory-page">
+
+  <!-- Header -->
+  <div class="memory-header">
+
+    <div class="memory-header__left">
+      <h1 class="memory-header__title">
+        Long-Term Memory
+      </h1>
+      <p class="memory-header__subtitle">
+        {{ totalCount() }}
+        {{ totalCount() === 1
+        ? 'memory' : 'memories' }}
+        stored
+      </p>
+    </div>
+
+    <div class="memory-header__actions">
+      @if (hasMemories()) {
+        <button
+          class="btn btn--ghost btn--danger"
+          (click)="confirmClear()"
+          [disabled]="isClearing()"
+          title="Clear all memories">
+          <span class="material-symbols-rounded">
+            delete_sweep
+          </span>
+          Clear all
+        </button>
+      }
+
+      <button
+        class="btn btn--primary"
+        (click)="toggleAddForm()"
+        title="Add memory">
+        <span class="material-symbols-rounded">
+          {{ showAddForm() ? 'close' : 'add' }}
+        </span>
+        {{ showAddForm() ? 'Cancel' : 'Add Memory' }}
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Success message -->
+  @if (successMessage()) {
+    <div class="alert alert--success">
+      <span class="material-symbols-rounded">
+        check_circle
+      </span>
+      {{ successMessage() }}
+    </div>
+  }
+
+  <!-- Error message -->
+  @if (errorMessage()) {
+    <div class="alert alert--error">
+      <span class="material-symbols-rounded">
+        error_outline
+      </span>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Add memory form -->
+  @if (showAddForm()) {
+    <div class="add-form-card">
+      <h2 class="add-form-card__title">
+        Add New Memory
+      </h2>
+
+      <form
+        [formGroup]="addForm"
+        (ngSubmit)="addMemory()">
+
+        <div class="form-row">
+
+          <!-- Type selector -->
+          <div class="field field--narrow">
+            <label
+              class="field__label"
+              for="memory-type">
+              Type
+            </label>
+            <select
+              id="memory-type"
+              class="field__select"
+              formControlName="memoryType">
+              @for (
+                type of memoryTypes;
+                track type
+                ) {
+                <option [value]="type">
+                  {{ getTypeLabel(type) }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- Content input -->
+          <div class="field field--grow">
+            <label
+              class="field__label"
+              for="memory-content">
+              Content
+            </label>
+            <input
+              id="memory-content"
+              class="field__input"
+              type="text"
+              formControlName="content"
+              placeholder="e.g. User prefers dark mode"
+              autocomplete="off"/>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button
+            class="btn btn--primary"
+            type="submit"
+            [disabled]="
+              addForm.invalid || isAdding()">
+            @if (isAdding()) {
+              <span class="spinner"></span>
+              Saving...
+            } @else {
+              <span class="material-symbols-rounded">
+                save
+              </span>
+              Save Memory
+            }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  }
+
+  <!-- Clear all confirm dialog -->
+  @if (showClearConfirm()) {
+    <div class="confirm-dialog">
+      <div class="confirm-dialog__box">
+        <span class="material-symbols-rounded
+                     confirm-dialog__icon">
+          warning
+        </span>
+        <h3 class="confirm-dialog__title">
+          Clear all memories?
+        </h3>
+        <p class="confirm-dialog__text">
+          This permanently deletes all
+          {{ totalCount() }} memories.
+          This cannot be undone.
+        </p>
+        <div class="confirm-dialog__actions">
+          <button
+            class="btn btn--ghost"
+            (click)="cancelClear()">
+            Cancel
+          </button>
+          <button
+            class="btn btn--danger"
+            (click)="clearAllMemories()">
+            <span class="material-symbols-rounded">
+              delete_forever
+            </span>
+            Yes, clear all
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Loading state -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span>
+      Loading memories...
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!isLoading() && !hasMemories()) {
+    <div class="empty-state">
+      <span class="material-symbols-rounded
+                   empty-state__icon">
+        psychology
+      </span>
+      <h2 class="empty-state__title">
+        No memories yet
+      </h2>
+      <p class="empty-state__text">
+        Jarvis automatically learns from your
+        conversations. You can also add memories
+        manually using the button above.
+      </p>
+    </div>
+  }
+
+  <!-- Memory list -->
+  @if (!isLoading() && hasMemories()) {
+    <div class="memory-list">
+      @for (
+        memory of memories();
+        track trackByMemory($index, memory)
+        ) {
+        <div class="memory-card">
+
+          <!-- Type badge + icon -->
+          <div
+            class="memory-card__type"
+            [style.color]="
+              getTypeBadgeColor(memory.type)"
+            [style.background]="
+              getTypeBadgeColor(memory.type) + '18'">
+            <span class="material-symbols-rounded">
+              {{ getTypeIcon(memory.type) }}
+            </span>
+            {{ getTypeLabel(memory.type) }}
+          </div>
+
+          <!-- Content -->
+          <p class="memory-card__content">
+            {{ memory.content }}
+          </p>
+
+          <!-- Meta -->
+          <div class="memory-card__meta">
+            <span class="memory-card__meta-item"
+                  title="Importance">
+              <span class="material-symbols-rounded">
+                star
+              </span>
+              {{ (memory.importance * 100)
+              .toFixed(0) }}%
+            </span>
+            <span class="memory-card__meta-item"
+                  title="Times used in prompts">
+              <span class="material-symbols-rounded">
+                visibility
+              </span>
+              {{ memory.accessCount }}
+            </span>
+            <span class="memory-card__meta-item">
+              {{ formatDate(memory.createdAt) }}
+            </span>
+          </div>
+
+          <!-- Delete button -->
+          <button
+            class="memory-card__delete"
+            (click)="deleteMemory(memory)"
+            [disabled]="deletingId() === memory.id"
+            title="Delete memory">
+            @if (deletingId() === memory.id) {
+              <span class="spinner spinner--dark">
+              </span>
+            } @else {
+              <span class="material-symbols-rounded">
+                close
+              </span>
+            }
+          </button>
+
+        </div>
+      }
+    </div>
+  }
+
+</div>
