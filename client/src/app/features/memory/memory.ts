@@ -3,7 +3,10 @@ import {
   inject,
   signal,
   computed,
-  OnInit
+  OnInit,
+  ElementRef,
+  ViewChild,
+  AfterViewInit
 } from '@angular/core';
 import {
   ReactiveFormsModule,
@@ -37,11 +40,15 @@ import {
   templateUrl: './memory.html',
   styleUrl: './memory.scss'
 })
-export class memory implements OnInit {
+export class MemoryPage implements OnInit {
 
   private readonly memoryService =
     inject(MemoryService);
   private readonly fb = inject(FormBuilder);
+
+  // Focus target inside confirm dialog box
+  @ViewChild('confirmBox')
+  confirmBox?: ElementRef<HTMLDivElement>;
 
   // ── State signals ─────────────────────────────
 
@@ -110,8 +117,11 @@ export class memory implements OnInit {
 
     this.memoryService.getMemories().subscribe({
       next: response => {
-        this.memories.set(response.data);
-        this.totalCount.set(response.data.length);
+        // Guard against missing data payload
+        // Prevents thrown errors bypassing error handler
+        const items = response.data ?? [];
+        this.memories.set(items);
+        this.totalCount.set(items.length);
         this.isLoading.set(false);
       },
       error: () => {
@@ -206,13 +216,27 @@ export class memory implements OnInit {
 
   confirmClear(): void {
     this.showClearConfirm.set(true);
+    // Move focus into dialog after Angular renders it
+    setTimeout(() => {
+      this.confirmBox?.nativeElement?.focus();
+    }, 50);
   }
 
   cancelClear(): void {
     this.showClearConfirm.set(false);
   }
 
+  onDialogKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.cancelClear();
+    }
+  }
+
   clearAllMemories(): void {
+    // Re-entrancy guard — prevents double-click
+    // firing two DELETE requests
+    if (this.isClearing()) return;
+
     this.isClearing.set(true);
     this.showClearConfirm.set(false);
     this.errorMessage.set(null);

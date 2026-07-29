@@ -18,4 +18,19 @@
   --warning:         #{$warning};
   --error:           #{$error};
   --info:            #{$info};
+
+  // Surface tokens adjust for light backgrounds
+  --success-surface: rgba(16, 185, 129, 0.08);
+  --error-surface:   rgba(239, 68, 68, 0.08);
+  --warning-surface: rgba(245, 158, 11, 0.08);
+  --info-surface:    rgba(59, 130, 246, 0.08);
+
+  --success-border:  rgba(16, 185, 129, 0.25);
+  --error-border:    rgba(239, 68, 68, 0.25);
+
+  // Lighter overlay for light theme
+  --overlay-bg:      rgba(0, 0, 0, 0.4);
+
+  --spinner-track:   rgba(255, 255, 255, 0.3);
+  --spinner-track-dark: rgba(0, 0, 0, 0.1);
 }
