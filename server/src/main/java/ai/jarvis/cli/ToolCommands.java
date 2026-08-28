@@ -148,6 +148,9 @@ public class ToolCommands {
             return Double.valueOf(trimmed);
         }
         if (targetType == boolean.class || targetType == Boolean.class) {
+            if (!"true".equalsIgnoreCase(trimmed) && !"false".equalsIgnoreCase(trimmed)) {
+                throw new IllegalArgumentException("Boolean value must be true or false.");
+            }
             return Boolean.valueOf(trimmed);
         }
         throw new IllegalArgumentException("Unsupported parameter type: " + targetType.getName());
