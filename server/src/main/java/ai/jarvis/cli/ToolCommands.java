@@ -10,6 +10,7 @@ import org.springframework.shell.core.command.annotation.Option;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 @Slf4j
@@ -43,7 +44,8 @@ public class ToolCommands {
 
             Method[] methods = tool.getClass().getDeclaredMethods();
             for (Method method : methods) {
-                if (!method.isAnnotationPresent(Tool.class)) {
+                if (!method.isAnnotationPresent(Tool.class)
+                        || !Modifier.isPublic(method.getModifiers())) {
                     continue;
                 }
 
@@ -106,7 +108,8 @@ public class ToolCommands {
         Method selectedMethod = null;
         for (Method method : selectedTool.getClass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(Tool.class)
-                    && methodName.equals(method.getName())) {
+                    && methodName.equals(method.getName())
+                    && Modifier.isPublic(method.getModifiers())) {
                 selectedMethod = method;
                 break;
             }
