@@ -2,6 +2,8 @@ package ai.jarvis.cli;
 
 import ai.jarvis.tools.JarvisTool;
 import ai.jarvis.tools.ToolRegistry;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.Option;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.List;
 
+@Slf4j
 @Component
 public class ToolCommands {
     private final CliStateManager state;
@@ -38,7 +41,7 @@ public class ToolCommands {
                     .append(tool.getClass().getSimpleName())
                     .append("\n");
 
-            Method[] methods = tool.getClass().getMethods();
+            Method[] methods = tool.getClass().getDeclaredMethods();
             for (Method method : methods) {
                 if (!method.isAnnotationPresent(Tool.class)) {
                     continue;
@@ -98,10 +101,10 @@ public class ToolCommands {
             }
         }
         if (selectedTool == null) {
-            return "Unknown tool: "+toolName;
+            return "Unknown tool: "+ toolName + ". Run 'tools' to see available tools and methods.";
         }
         Method selectedMethod = null;
-        for (Method method : selectedTool.getClass().getMethods()) {
+        for (Method method : selectedTool.getClass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(Tool.class)
                     && methodName.equals(method.getName())) {
                 selectedMethod = method;
@@ -109,7 +112,7 @@ public class ToolCommands {
             }
         }
         if (selectedMethod == null) {
-            return "Unknown method: "+methodName;
+            return "Unknown method: " + methodName + ". Run 'tools' to see available tools and methods.";
         }
         try {
             Class<?>[] parameterTypes = selectedMethod.getParameterTypes();

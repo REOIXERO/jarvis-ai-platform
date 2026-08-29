@@ -76,5 +76,20 @@ class ToolCommandsTest {
         String result = toolCommands.toolTest("DateTimeTool", "getCurrentDateTime", "");
         assertThat(result).isNotBlank();
     }
-
+    @Test
+    @DisplayName("tool-test should point to tools command for unknown tool")
+    void toolTestShouldPointToToolsCommandForUnknownTool() {
+        when(state.isLoggedIn()).thenReturn(true);
+        String result = toolCommands.toolTest("UnknownTool", "calculate", "2847 * 391");
+        assertThat(result).contains("Unknown tool: UnknownTool")
+                .contains("Run 'tools'");
+    }
+    @Test
+    @DisplayName("tool-test should point to tools command for unknown method")
+    void toolTestShouldPointToToolsCommandForUnknownMethod() {
+        when(state.isLoggedIn()).thenReturn(true);
+        String result = toolCommands.toolTest("CalculatorTool", "unknownMethod", "1 + 1");
+        assertThat(result).contains("Unknown method: unknownMethod")
+                .contains("Run 'tools'");
+    }
 }
