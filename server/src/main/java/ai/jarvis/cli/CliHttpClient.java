@@ -105,6 +105,20 @@ public class CliHttpClient {
                 .body(Map.class);
     }
 
+    // ── DELETE ───────────────────────────────────────
+
+    public void deleteWithAuth(
+            String uri,
+            String token) {
+        restClient
+                .delete()
+                .uri(uri)
+                .header("Authorization",
+                        "Bearer " + token)
+                .retrieve()
+                .toBodilessEntity();
+    }
+    
     // ── Health check ─────────────────────────────
 
     public boolean isServerReachable() {
