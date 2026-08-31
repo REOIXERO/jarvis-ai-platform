@@ -247,7 +247,7 @@ class VoiceConversationServiceTest {
                 .thenReturn(Mono.just("Hello!"));
         when(orchestrator.chat(
                 any(OrchestratorRequest.class)))
-                .thenReturn(Flux.just("Hi there."));
+                .thenReturn(Flux.defer(() -> Flux.just("Hi there.")));
 
         // speakAndPlay NOT stubbed — TTS runs on
         // background boundedElastic thread and is
