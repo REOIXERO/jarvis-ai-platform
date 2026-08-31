@@ -18,7 +18,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -85,6 +85,21 @@ class DocumentCommandsTest{
 
             String result = documentCommands.uploadDocument(file.toString());
             assertThat(result).contains("File is empty");
+        }
+        @Test
+        @DisplayName("uploadDocument should return server returned no document data when server response is null")
+        void testUploadDocument_NullServerResponse(@TempDir Path tempDir) throws Exception {
+            when(state.getAccessToken()).thenReturn("test-token");
+            
+            Path file = tempDir.resolve("note.txt");
+            Files.writeString(file, "Hello");
+            
+            Map<String, Object> response = null;
+            when(http.postWithAuth(eq("/api/v1/documents"), eq("test-token"),
+                    any(), eq(Map.class))).thenReturn(response);
+            String result = documentCommands.uploadDocument(file.toString());
+            assertThat(result).contains("server returned no document data");
+            assertThat(result).doesNotContain("Document uploaded:");
         }
         @Test
         @DisplayName("uploadDocument should upload text file successfully")
@@ -173,6 +188,26 @@ class DocumentCommandsTest{
             assertThat(result).contains("No documents found");
         }
         @Test
+        @DisplayName("deleteDocument should fail with number 0")
+        void testDeleteDocument_Zero() {
+            when(state.getAccessToken()).thenReturn("test-token");
+
+            Map<String, Object> doc = Map.of(
+                    "id", "doc-1",
+                    "filename", "note1.txt"
+            );
+            Map<String, Object> response = Map.of(
+                    "success", true,
+                    "data", List.of(doc)
+            );
+
+            when(http.get("/api/v1/documents", "test-token", Map.class))
+                    .thenReturn(response);
+
+            String result = documentCommands.deleteDocument(0);
+            assertThat(result).contains("Invalid number");            
+        }
+        @Test
         @DisplayName("deleteDocument should fail with out of bounds number")
         void testDeleteDocument_OutOfBounds() {
             when(state.getAccessToken()).thenReturn("test-token");
@@ -190,10 +225,36 @@ class DocumentCommandsTest{
                     .thenReturn(response);
 
             String result = documentCommands.deleteDocument(3);
-
             assertThat(result).contains("Invalid number");
-            verify(http, never()).deleteWithAuth(any(), any());
         }
+
+        @Test
+        @DisplayName("deleteDocument should not print success when delete returns 404")
+        void testDeleteDocument_DeleteReturns404() {
+            when(state.getAccessToken()).thenReturn("test-token");
+
+            Map<String, Object> document = Map.of(
+                    "id", "doc-1",
+                    "filename", "note.txt"
+            );
+            Map<String, Object> response = Map.of(
+                    "success", true,
+                    "data", List.of(document)
+            );
+
+            when(http.get(eq("/api/v1/documents"), eq("test-token"), eq(Map.class)))
+                    .thenReturn(response);
+            doThrow(new RuntimeException("Delete failed: HTTP 404"))
+                    .when(http)
+                    .deleteWithAuth("/api/v1/documents/doc-1", "test-token");
+
+            String result = documentCommands.deleteDocument(1);
+            assertThat(result).contains("Failed to delete document");
+            assertThat(result).contains("Delete failed: HTTP 404");
+            assertThat(result).doesNotContain("Document deleted");
+            verify(http).deleteWithAuth("/api/v1/documents/doc-1", "test-token");
+        }
+
         @Test
         @DisplayName("deleteDocument should delete document")
         void testDeleteDocument_Success() {

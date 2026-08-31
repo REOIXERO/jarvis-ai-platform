@@ -12,6 +12,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * CLI commands for managing uploaded documents.
+ * Supports upload, list, and delete operations.
+ */
 @Slf4j
 @Component
 public class DocumentCommands {

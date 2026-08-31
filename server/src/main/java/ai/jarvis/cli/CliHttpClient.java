@@ -116,6 +116,11 @@ public class CliHttpClient {
                 .header("Authorization",
                         "Bearer " + token)
                 .retrieve()
+                .onStatus(HttpStatusCode::isError, (request, response) -> {
+                        throw new RuntimeException(
+                                "Delete failed: HTTP "
+                                + response.getStatusCode().value());
+                })
                 .toBodilessEntity();
     }
     
